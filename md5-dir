@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Check if directory argument is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <directory>"
+    exit 1
+fi
+
+directory="$1"
+output_file="${directory##*/}.log"
+
+# Check if directory exists
+if [ ! -d "$directory" ]; then
+    echo "Error: Directory '$directory' does not exist"
+    exit 1
+fi
+
+# Find all files recursively and calculate MD5
+find "$directory" -type f -print0 | while IFS= read -r -d '' file; do
+    # Get just the filename without the path
+    filename=$(basename "$file")
+    # Calculate MD5 and format output
+    md5sum "$file" | awk -v filename="$filename" '{print $1, filename}' 
+done > "$output_file"
+
+echo "MD5 hashes have been saved to $output_file"
