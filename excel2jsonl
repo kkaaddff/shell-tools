@@ -8,7 +8,7 @@ from pathlib import Path
 import argparse
 
 
-def excel_to_batch(excel_file, output_file='batch-0416.txt'):
+def excel_to_batch(excel_file, output_file):
     """
     读取Excel文件并将内容转换为JSONL格式的文本文件（每行一个JSON对象）
     :param excel_file: Excel文件路径
@@ -51,11 +51,15 @@ if __name__ == "__main__":
     # 创建命令行参数解析器
     parser = argparse.ArgumentParser(description='将Excel文件转换为JSONL格式')
     parser.add_argument('input_file', help='输入的Excel文件路径')
-    parser.add_argument(
-        '-o', '--output', help='输出的JSONL文件路径（默认为batch-0416.txt）', default='batch-0416.txt')
+    parser.add_argument('-o', '--output', help='输出的JSONL文件路径（默认为输入文件名.jsonl）')
 
     # 解析命令行参数
     args = parser.parse_args()
+
+    # 如果没有指定输出文件，则使用输入文件名，但改变扩展名为.jsonl
+    if args.output is None:
+        input_path = Path(args.input_file)
+        args.output = str(input_path.with_suffix('.jsonl'))
 
     # 调用转换函数
     excel_to_batch(args.input_file, args.output)
