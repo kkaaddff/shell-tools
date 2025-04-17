@@ -5,6 +5,7 @@ import os
 import json
 import numpy as np
 from pathlib import Path
+import argparse
 
 
 def excel_to_batch(excel_file, output_file='batch-0416.txt'):
@@ -47,6 +48,14 @@ def excel_to_batch(excel_file, output_file='batch-0416.txt'):
 
 
 if __name__ == "__main__":
-    # 指定要处理的Excel文件名
-    target_excel = "4.16t调整价格.xlsx"  # 在这里修改为你要处理的Excel文件名
-    excel_to_batch(target_excel)
+    # 创建命令行参数解析器
+    parser = argparse.ArgumentParser(description='将Excel文件转换为JSONL格式')
+    parser.add_argument('input_file', help='输入的Excel文件路径')
+    parser.add_argument(
+        '-o', '--output', help='输出的JSONL文件路径（默认为batch-0416.txt）', default='batch-0416.txt')
+
+    # 解析命令行参数
+    args = parser.parse_args()
+
+    # 调用转换函数
+    excel_to_batch(args.input_file, args.output)
