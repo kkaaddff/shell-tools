@@ -1,0 +1,52 @@
+#!/usr/bin/env python3.9
+
+import pandas as pd
+import os
+import json
+import numpy as np
+from pathlib import Path
+
+
+def excel_to_batch(excel_file, output_file='batch-0416.txt'):
+    """
+    读取Excel文件并将内容转换为JSONL格式的文本文件（每行一个JSON对象）
+    :param excel_file: Excel文件路径
+    :param output_file: 输出文件路径，默认为batch-0416.txt
+    """
+    try:
+        if not os.path.exists(excel_file):
+            print(f"错误：找不到文件 {excel_file}")
+            return
+
+        # 读取Excel文件
+        df = pd.read_excel(excel_file)
+
+        # 将所有NaN值替换为空字符串
+        df = df.replace({np.nan: ''})
+
+        # 将DataFrame转换为字典列表
+        records = df.to_dict('records')
+
+        # 确保输出目录存在
+        output_path = Path(output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # 将每条记录转换为JSON字符串并写入文件（每行一个）
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for record in records:
+                # 将所有值转换为字符串
+                record = {k: str(v) for k, v in record.items()}
+                # 转换为JSON字符串并写入一行
+                json_line = json.dumps(record, ensure_ascii=False)
+                f.write(json_line + '\n')
+
+        print(f"文件已成功转换为JSONL格式并保存到: {output_file}")
+
+    except Exception as e:
+        print(f"处理过程中出现错误: {str(e)}")
+
+
+if __name__ == "__main__":
+    # 指定要处理的Excel文件名
+    target_excel = "4.16t调整价格.xlsx"  # 在这里修改为你要处理的Excel文件名
+    excel_to_batch(target_excel)
